@@ -1,0 +1,44 @@
+[project]
+name = "oaken-tower-neural-net"
+version = "0.1.0"
+description = "Neural Network project to build a bot that competes in Oaken Tower ranekd play"
+readme = "README.md"
+authors = [
+    { name = "Andrew Suter", email = "andrewasuter@outlook.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+  # Core
+  "numpy>=2.0", "pandas>=2.2", "scipy", "scikit-learn>=1.5",
+  # Gradient boosting
+  "xgboost", "lightgbm", "catboost",
+  # Deep learning
+  "torch>=2.11.0", "torchvision>=0.26.0",
+  # Viz
+  "matplotlib", "seaborn", "plotly",
+  # Tracking / tuning / interpretability
+  "mlflow", "wandb", "optuna", "shap",
+  # Data I/O + cloud
+  "pyarrow", "polars", "sqlalchemy", "boto3", "s3fs",
+  "psycopg2-binary", "snowflake-connector-python",
+  # Utilities
+  "tqdm", "joblib", "pydantic",
+]
+
+[project.scripts]
+train = "churn_model.train:main"          # uv run train
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-cov", "ruff", "mypy", "pre-commit"]
+notebooks = ["jupyterlab", "ipykernel", "ipywidgets"]
+apps = ["streamlit", "gradio"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[build-system]
+requires = ["uv_build>=0.12,<0.13"]
+build-backend = "uv_build"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "NPY", "PD"]   # NPY/PD = NumPy/pandas gotchas
