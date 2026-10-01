@@ -1,44 +1,105 @@
+# =============================================================================
+# Data Science Project Template (uv)
+# -----------------------------------------------------------------------------
+# HOW TO USE THIS TEMPLATE
+#   1. uv init my-project --python 3.12
+#   2. Replace the generated pyproject.toml with this file
+#   3. Change `name` below to match your folder (my-project -> my_project in src/)
+#   4. uv sync                     # installs core + default groups
+#      uv sync --all-groups        # also installs ml + deep learning
+#   5. git add pyproject.toml uv.lock .python-version
+# =============================================================================
+
 [project]
-name = "oaken-tower-neural-net"
+name = "oaken_tower_neural_net"                       # <-- CHANGE ME (src/my_project/ must match)
 version = "0.1.0"
-description = "Neural Network project to build a bot that competes in Oaken Tower ranekd play"
+description = "Oaken Tower neural network project"
 readme = "README.md"
-authors = [
-    { name = "Andrew Suter", email = "andrewasuter@outlook.com" }
-]
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.14"
+
+# Core: what your code needs to run. Keep this lean.
 dependencies = [
-  # Core
-  "numpy>=2.0", "pandas>=2.2", "scipy", "scikit-learn>=1.5",
-  # Gradient boosting
-  "xgboost", "lightgbm", "catboost",
-  # Deep learning
-  "torch>=2.11.0", "torchvision>=0.26.0",
-  # Viz
-  "matplotlib", "seaborn", "plotly",
-  # Tracking / tuning / interpretability
-  "mlflow", "wandb", "optuna", "shap",
-  # Data I/O + cloud
-  "pyarrow", "polars", "sqlalchemy", "boto3", "s3fs",
-  "psycopg2-binary", "snowflake-connector-python",
-  # Utilities
-  "tqdm", "joblib", "pydantic",
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "polars>=1.44",
+    "scipy>=1.14",
+    "scikit-learn>=1.6",
+    "pyarrow>=18.0",        # fast parquet I/O, pandas backend
+    "tqdm>=4.66",           # progress bars
+    "pyyaml>=6.0",          # config files
+    "python-dotenv>=1.0",   # load secrets from .env (never commit .env)
 ]
 
-[project.scripts]
-train = "churn_model.train:main"          # uv run train
+# Optional shortcut: `uv run train` (uncomment once src/my_project/train.py has main())
+# [project.scripts]
+# train = "my_project.train:main"
 
+# -----------------------------------------------------------------------------
+# Dependency groups: local tooling, not part of the core package.
+# Add more with: uv add --group <name> <package>
+# -----------------------------------------------------------------------------
 [dependency-groups]
-dev = ["pytest>=8", "pytest-cov", "ruff", "mypy", "pre-commit"]
-notebooks = ["jupyterlab", "ipykernel", "ipywidgets"]
-apps = ["streamlit", "gradio"]
+dev = [
+    "ipykernel>=7.4.0",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+notebooks = [
+    "jupyterlab>=4.3",
+    "ipykernel>=6.29",
+    "ipywidgets>=8.1",
+]
+viz = [
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "plotly>=5.24",
+]
+ml = [
+    "xgboost>=2.1",
+    "lightgbm>=4.5",
+    "shap>=0.46",
+    "optuna>=4.0",
+]
+dl = [
+    "torch>=2.8",           # Mac: MPS included. Linux GPU: see uv PyTorch guide
+    "torchvision>=0.23",
+]
 
+# -----------------------------------------------------------------------------
+# uv settings
+# -----------------------------------------------------------------------------
 [tool.uv]
-default-groups = ["dev"]
+# Installed by plain `uv sync` / `uv run`. Heavy groups (ml, dl) are opt-in:
+#   uv sync --group dl     or     uv sync --all-groups
+# Want everything always? Use: default-groups = "all"
+default-groups = ["dev", "notebooks", "viz"]
 
 [build-system]
 requires = ["uv_build>=0.12,<0.13"]
 build-backend = "uv_build"
 
+# -----------------------------------------------------------------------------
+# Tool config
+# -----------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+extend-include = ["*.ipynb"]           # lint notebooks too
+
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "NPY", "PD"]   # NPY/PD = NumPy/pandas gotchas
+select = [
+    "E", "F",    # pycodestyle + pyflakes (errors, unused imports)
+    "I",         # import sorting
+    "B",         # common bugs
+    "UP",        # modern Python syntax
+    "NPY",       # NumPy gotchas
+    "PD",        # pandas gotchas
+]
+ignore = ["E501", "PD901"]             # long lines (formatter handles), allow `df`
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
